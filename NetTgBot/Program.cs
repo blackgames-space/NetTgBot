@@ -73,7 +73,15 @@ public class Program
             // Message sentMessage = await botClient.SendTextMessageAsync(chatId, text: "You said:\n" + messageText);
             Console.WriteLine(message.Text);
 
-            ws?.Send(message.Text);
+            var date = message.Date.ToLocalTime();
+
+            var req = $"{{\"text\":\"{message.Text}\", \"date\":{{" +
+                $"\"hour\":{date.Hour}, " +
+                $"\"minutes\":{date.Minute}," +
+                $"\"seconds\":{date.Second}}}}}";
+
+            //await Console.Out.WriteLineAsync(req);
+            ws?.Send(req);
         }
         catch (Exception ex)
         {
