@@ -75,10 +75,10 @@ public class Program
 
             var date = message.Date.ToLocalTime();
 
-            var req = $"{{\"text\":\"{message.Text}\", \"date\":{{" +
+            var req = $"{{\"payload\":{{\"text\":\"{message.Text}\", \"date\":{{" +
                 $"\"hour\":{date.Hour}, " +
                 $"\"minutes\":{date.Minute}," +
-                $"\"seconds\":{date.Second}}}}}";
+                $"\"seconds\":{date.Second}}}}}}}";
 
             //await Console.Out.WriteLineAsync(req);
             ws?.Send(req);
