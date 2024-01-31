@@ -7,7 +7,7 @@ using WebSocket4Net;
 
 public class Program
 {
-    public WebSocket? ws;
+    private WebSocket? _socket;
 
     public static async Task Main(params string[] args)
     {
@@ -42,15 +42,14 @@ public class Program
 
         Console.WriteLine($"{me.FirstName} was started!");
 
-        using (ws = new WebSocket($"ws://{url}:8080"))
+        using (_socket = new WebSocket($"ws://{url}:8080"))
         {
-
-            ws.Opened += (sender, e) => Console.WriteLine("Connect");
+            _socket.Opened += (sender, e) => Console.WriteLine("Connect");
 
            /* ws.MessageReceived += (sender, e) =>
                               Console.WriteLine("Laputa says: " + e.Message);*/
 
-            ws.Open();
+            _socket.Open();
             Console.ReadKey(true);
         }
 
@@ -73,20 +72,25 @@ public class Program
             // Message sentMessage = await botClient.SendTextMessageAsync(chatId, text: "You said:\n" + messageText);
             Console.WriteLine(message.Text);
 
-            var date = message.Date.ToLocalTime();
-
-            var req = $"{{\"payload\":{{\"text\":\"{message.Text}\", \"date\":{{" +
-                $"\"hour\":{date.Hour}, " +
-                $"\"minutes\":{date.Minute}," +
-                $"\"seconds\":{date.Second}}}}}}}";
-
-            //await Console.Out.WriteLineAsync(req);
-            ws?.Send(req);
+            string req = CreateRequest(message);
+            _socket?.Send(req);
         }
         catch (Exception ex)
         {
             Console.WriteLine(ex.ToString());
         }
+    }
+
+    private static string CreateRequest(Message message)
+    {
+        var date = message.Date.ToLocalTime();
+
+        return $"{{\"payload\":" +
+            $"{{\"payload\":{{\"text\":\"{message.Text}\", " +
+            $"\"date\":{{" +
+            $"\"hour\":{date.Hour}, " +
+            $"\"minutes\":{date.Minute}," +
+            $"\"seconds\":{date.Second}}}}}}}}}";
     }
 
     private Task ErrorHandler(ITelegramBotClient botClient, Exception error, CancellationToken cancellationToken)
